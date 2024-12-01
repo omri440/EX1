@@ -33,16 +33,16 @@ int main(void) {
     int **mat2;
 
     // Get number of rows
-    numberOfRows = getValidatedInput("Enter the number of rows: ", MIN_SIZE, MAX_SIZE, "Wrong number of rows, please try again.\n");
+    numberOfRows = getValidatedInput("Insert number of rows", MIN_SIZE, MAX_SIZE, "Wrong number of rows, please try again.\n");
 
     // Get number of columns
-    numberOfColumns = getValidatedInput("Enter the number of columns: ", MIN_SIZE, MAX_SIZE, "Wrong number of cols, please try again.\n");
+    numberOfColumns = getValidatedInput("Insert number of columns", MIN_SIZE, MAX_SIZE, "Wrong number of cols, please try again.\n");
     matrix = allocateMatrix(numberOfRows, numberOfColumns);
     SetInitalMatrix(matrix, numberOfRows, numberOfColumns);
     // Display the menu and get user choice
     while (userChoice != 0) {
         displayMenu();
-        userChoice = getValidatedInput("Enter a valid value: ", 0, 9, "Wrong input, try again.\n");
+        userChoice = getValidatedInput("Please enter your choice:", 0, 9, "Wrong input, try again.\n");
 
 
         // Process the choice (placeholders for now)
@@ -96,6 +96,8 @@ int main(void) {
                 break;
             case 0:
                 break;
+            default:
+                break;
         }
     }
 
@@ -108,7 +110,7 @@ int getValidatedInput(const char *prompt, int min, int max, const char *errorMes
     char buffer[100];
 
     while (1) {
-        printf("%s", prompt);
+        printf("%s (%d-%d): ", prompt, min, max);
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
             if (sscanf(buffer, "%d", &value) == 1 && value >= min && value <= max) {
                 return value;
@@ -120,16 +122,16 @@ int getValidatedInput(const char *prompt, int min, int max, const char *errorMes
 
 // Function to display the menu
 void displayMenu() {
-    printf("\n1. Display the matrix.\n");
+    printf("1. Display the matrix.\n");
     printf("2. Insert values to the matrix.\n");
     printf("3. Transpose matrix.\n");
     printf("4. Sort the matrix by rows sum.\n");
     printf("5. Sort the whole matrix.\n");
     printf("6. Print matrix value.\n");
-    printf("7. i-th power of matrix.\n");
-    printf("8. Find sub matrix.\n");
+    printf("7. Compute i-th power of matrix.\n");
+    printf("8. Find submatrix.\n");
     printf("9. Multiply with another matrix.\n");
-    printf("0. Exit.\n\n");
+    printf("0. Exit.\n");
 }
 
 
@@ -158,20 +160,31 @@ void SetInitalMatrix(int** matrix, int rows, int cols) {
 }
 
 void PrintMat(int** matrix, int rows, int cols) {
+    printf("Matrix:\n");
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             printf("%d ", matrix[i][j]);
         }
-        printf("\n");
+
+            printf("\n");
+
     }
 }
 
 void SetMatrix(int** matrix, int rows, int cols) {
-    printf("Enter %d integers (separated by spaces or newlines):\n", rows * cols);
+    printf("Enter values for the matrix (%d X %d):\n", rows,cols);
 
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            scanf("%d", &matrix[i][j]);
+    int count = 0;
+    while (count < rows * cols) {
+        int value;
+        if (scanf("%d", &value) == 1) {
+            int row = count / cols;
+            int col = count % cols;
+            matrix[row][col] = value;
+            count++;
+        } else {
+            printf("Invalid input, please try again.\n");
+            while (getchar() != '\n');  // Clear the input buffer
         }
     }
 }
@@ -275,7 +288,7 @@ void PowerMatrixWithDefault(int*** matrix, int* rows, int* cols) {
 void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) {
     // Check if the matrix is square
     if (*rows != *cols) {
-        printf("Matrix must be square for this operation.\n");
+        printf("Matrix must be square for this operation.");
         return;
     }
 
@@ -286,10 +299,10 @@ void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) {
 
     // If power was set to the default value, ask for user input
     do {
-        printf("Enter power: \n");
+        printf("Enter power: ");
         scanf("%d", power); // Take input directly into the power pointer
         if (*power <= 0) {
-            printf("The power need to Integer Greater Then 0 \n");
+            printf("The power need to Integer Greater Then 0");
         }
     } while (*power <= 0);
 
@@ -343,19 +356,23 @@ void SubMatrix(int*** matrix, int* rows, int* cols) {
 
 void ValidateSubMatrixInputs(int rows, int cols, int* subRows, int* subCols, int* start_row, int* start_col) {
     do {
-        printf("Enter starting row index (0 to %d): \n", rows - 1);
+        printf("Enter submatrix rows: ");
+        scanf("%d", subRows);
+
+        printf("Enter base row: ");
         scanf("%d", start_row);
-        printf("Enter starting column index (0 to %d): \n", cols - 1);
+        printf("Enter submatrix columns: ");
+        scanf("%d", subCols);
+
+        printf("Enter base columns: ");
         scanf("%d", start_col);
 
-        printf("Enter submatrix rows: \n");
-        scanf("%d", subRows);
-        printf("Enter submatrix cols: \n");
-        scanf("%d", subCols);
+
+
 
         if (*subRows <= 0 || *subCols <= 0 || *start_row < 0 || *start_col < 0 ||
             *start_row + *subRows > rows || *start_col + *subCols > cols) {
-            printf("Invalid submatrix dimensions or starting position. Try again.\n");
+            printf("Submatrix size exceeds original matrix dimensions.\n");
             }
     } while (*subRows <= 0 || *subCols <= 0 || *start_row < 0 || *start_col < 0 ||
              *start_row + *subRows > rows || *start_col + *subCols > cols);
@@ -398,3 +415,4 @@ void MatMul(int*** Mat1, int** Mat2, int* dim1, int* dim2, int* dim3) {
     // עדכון Mat1 לתוצאה החדשה
     *Mat1 = tempMatrix;
 }
+
