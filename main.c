@@ -18,9 +18,11 @@ void SortMatrixByRowSum(int** matrix, int rows, int cols);
 void SortMatrix(int** matrix, int rows, int cols) ;
 void PrintMatrixVal(int** matrix, int rows, int cols) ;
 void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) ;
-int SubMatrix(int*** matrix, int* rows, int* cols, int subRows, int subCols,int start_row,int start_col) ;
+void SubMatrix(int*** matrix, int* rows, int* cols);
 void MatMul(int*** Mat1, int** Mat2, int dim1, int* dim2, int dim3) ;
 void PowerMatrixWithDefault(int*** matrix, int* rows, int* cols) ;
+void ValidateSubMatrixInputs(int rows, int cols, int* subRows, int* subCols, int* start_row, int* start_col) ;
+void CalculateSubMatrix(int*** matrix, int* rows, int* cols, int subRows, int subCols, int start_row, int start_col);
 
 int main(void) {
     int numberOfRows = 0;
@@ -65,7 +67,7 @@ int main(void) {
                 PowerMatrixWithDefault(&matrix, &numberOfRows, &numberOfColumns);
                 break;
             case 8:
-
+                 SubMatrix(&matrix,&numberOfRows,&numberOfColumns);
                 break;
             case 9:
                 printf("Multiplying with another matrix...\n");
@@ -307,4 +309,53 @@ void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) {
 }
 
 
+void SubMatrix(int*** matrix, int* rows, int* cols) {
+    int subRows, subCols, start_row, start_col;
 
+    // Validate inputs
+    ValidateSubMatrixInputs(*rows, *cols, &subRows, &subCols, &start_row, &start_col);
+
+    // Calculate and extract the submatrix
+    CalculateSubMatrix(matrix, rows, cols, subRows, subCols, start_row, start_col);
+}
+
+
+
+void ValidateSubMatrixInputs(int rows, int cols, int* subRows, int* subCols, int* start_row, int* start_col) {
+    do {
+        printf("Enter starting row index (0 to %d): \n", rows - 1);
+        scanf("%d", start_row);
+        printf("Enter starting column index (0 to %d): \n", cols - 1);
+        scanf("%d", start_col);
+
+        printf("Enter submatrix rows: \n");
+        scanf("%d", subRows);
+        printf("Enter submatrix cols: \n");
+        scanf("%d", subCols);
+
+        if (*subRows <= 0 || *subCols <= 0 || *start_row < 0 || *start_col < 0 ||
+            *start_row + *subRows > rows || *start_col + *subCols > cols) {
+            printf("Invalid submatrix dimensions or starting position. Try again.\n");
+            }
+    } while (*subRows <= 0 || *subCols <= 0 || *start_row < 0 || *start_col < 0 ||
+             *start_row + *subRows > rows || *start_col + *subCols > cols);
+}
+
+
+void CalculateSubMatrix(int*** matrix, int* rows, int* cols, int subRows, int subCols, int start_row, int start_col) {
+    // Allocate space for the submatrix
+    int** tempMatrix = allocateMatrix(subRows, subCols);
+
+    // Copy submatrix values
+    for (int i = 0; i < subRows; i++) {
+        for (int j = 0; j < subCols; j++) {
+            tempMatrix[i][j] = (*matrix)[i + start_row][j + start_col];
+        }
+    }
+
+    // Free the original matrix and update the pointer
+    freeMatrix(*matrix, *rows);
+    *matrix = tempMatrix;
+    *rows = subRows;
+    *cols = subCols;
+}
