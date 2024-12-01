@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -16,9 +17,10 @@ void TransposeMatrix(int*** matrix, int* rows, int* cols);
 void SortMatrixByRowSum(int** matrix, int rows, int cols);
 void SortMatrix(int** matrix, int rows, int cols) ;
 void PrintMatrixVal(int** matrix, int rows, int cols) ;
-void PowerMatrix(int*** matrix, int* rows, int* cols, int power) ;
+void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) ;
 int SubMatrix(int*** matrix, int* rows, int* cols, int subRows, int subCols,int start_row,int start_col) ;
 void MatMul(int*** Mat1, int** Mat2, int dim1, int* dim2, int dim3) ;
+void PowerMatrixWithDefault(int*** matrix, int* rows, int* cols) ;
 
 int main(void) {
     int numberOfRows = 0;
@@ -54,16 +56,16 @@ int main(void) {
                 SortMatrixByRowSum(matrix, numberOfRows, numberOfColumns);
                 break;
             case 5:
-                printf("Sorting the whole matrix...\n");
+                SortMatrix(matrix, numberOfRows, numberOfColumns);
                 break;
             case 6:
-                printf("Printing matrix value...\n");
+                PrintMatrixVal(matrix, numberOfRows, numberOfColumns);
                 break;
             case 7:
-                printf("Calculating i-th power of the matrix...\n");
+                PowerMatrixWithDefault(&matrix, &numberOfRows, &numberOfColumns);
                 break;
             case 8:
-                printf("Finding a sub-matrix...\n");
+
                 break;
             case 9:
                 printf("Multiplying with another matrix...\n");
@@ -205,4 +207,104 @@ void SortMatrixByRowSum(int** matrix, int rows, int cols) {
         }
     }
 }
+
+void SortMatrix(int** matrix, int rows, int cols) {
+    bool sorted = false;
+    while (!sorted) {
+        sorted = true;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols - 1; j++) {
+                if (matrix[i][j] > matrix[i][j + 1]) {
+                    int temp = matrix[i][j];
+                    matrix[i][j] = matrix[i][j + 1];
+                    matrix[i][j + 1] = temp;
+                    sorted = false;
+                }
+            }
+
+            if (i < rows - 1 && matrix[i][cols - 1] > matrix[i + 1][0]) {
+                int temp = matrix[i][cols - 1];
+                matrix[i][cols - 1] = matrix[i + 1][0];
+                matrix[i + 1][0] = temp;
+                sorted = false;
+            }
+        }
+    }
+}
+
+void PrintMatrixVal(int** matrix, int rows, int cols) {
+    int sumProduct = 0 ;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            sumProduct += matrix[i][j]*(i+1)*(j+1);
+        }
+
+    }
+    printf("Matrix Value: %d\n",sumProduct);
+}
+
+void PowerMatrixWithDefault(int*** matrix, int* rows, int* cols) {
+    int defaultPower = 0; // Start with default value 0 to trigger user input in PowerMatrix
+    PowerMatrix(matrix, rows, cols, &defaultPower);
+}
+
+
+void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) {
+    // Check if the matrix is square
+    if (*rows != *cols) {
+        printf("Matrix must be square for this operation.\n");
+        return;
+    }
+
+    // If power is 0, set a default value
+    if (*power == 0) {
+        printf("Default power set to 1.\n");
+        *power = 1; // Default value
+    }
+
+    // If power was set to the default value, ask for user input
+    do {
+        printf("Enter the power of the matrix (current value: %d):\n", *power);
+        scanf("%d", power); // Take input directly into the power pointer
+        if (*power <= 0) {
+            printf("The power needs to be an integer greater than 0.\n");
+        }
+    } while (*power <= 0);
+
+    // Temporary matrices to store results
+    int** tempMatrix = allocateMatrix(*rows, *cols);  // Temporary result
+    int** originalMatrix = allocateMatrix(*rows, *cols);  // Copy of the original matrix
+
+    // Copy the original matrix into originalMatrix
+    for (int i = 0; i < *rows; i++) {
+        for (int j = 0; j < *cols; j++) {
+            originalMatrix[i][j] = (*matrix)[i][j];
+        }
+    }
+
+    // Compute the power
+    for (int k = 1; k < *power; k++) { // Start from 1 because the original matrix is already M^1
+        for (int i = 0; i < *rows; i++) {
+            for (int j = 0; j < *cols; j++) {
+                tempMatrix[i][j] = 0; // Initialize to 0 at each step
+                for (int l = 0; l < *rows; l++) {
+                    tempMatrix[i][j] += (*matrix)[i][l] * originalMatrix[l][j];
+                }
+            }
+        }
+
+        // Copy tempMatrix back into matrix
+        for (int i = 0; i < *rows; i++) {
+            for (int j = 0; j < *cols; j++) {
+                (*matrix)[i][j] = tempMatrix[i][j];
+            }
+        }
+    }
+
+    // Free temporary matrices
+    freeMatrix(tempMatrix, *rows);
+    freeMatrix(originalMatrix, *rows);
+}
+
+
 
