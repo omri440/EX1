@@ -51,7 +51,7 @@ int main(void) {
                 TransposeMatrix(&matrix, &numberOfRows, &numberOfColumns);
                 break;
             case 4:
-                printf("Sorting the matrix by rows sum...\n");
+                SortMatrixByRowSum(matrix, numberOfRows, numberOfColumns);
                 break;
             case 5:
                 printf("Sorting the whole matrix...\n");
@@ -180,12 +180,29 @@ void TransposeMatrix(int*** matrix, int* rows, int* cols) {
     *cols = temp;
 }
 
+
+
 void SortMatrixByRowSum(int** matrix, int rows, int cols) {
-    int arr[rows]{0};
-    for (int i = 0; i < rows; i++) {
+    for (int i = 1; i < rows; i++) {
+        // חישוב סכום השורה הנוכחית
+        int currentRowSum = 0;
         for (int j = 0; j < cols; j++) {
-            arr[i] += matrix[i][j];
+            currentRowSum += matrix[i][j];
+        }
+
+        // חישוב סכום השורה הקודמת
+        int previousRowSum = 0;
+        for (int j = 0; j < cols; j++) {
+            previousRowSum += matrix[i - 1][j];
+        }
+
+        // השוואה והחלפה לפי הצורך
+        if (currentRowSum < previousRowSum) {
+            // החלפה בין השורות
+            int* temp = matrix[i - 1];
+            matrix[i - 1] = matrix[i];
+            matrix[i] = temp;
         }
     }
-
 }
+
