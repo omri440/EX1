@@ -281,16 +281,15 @@ void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) {
 
     // If power is 0, set a default value
     if (*power == 0) {
-        printf("Default power set to 1.\n");
         *power = 1; // Default value
     }
 
     // If power was set to the default value, ask for user input
     do {
-        printf("Enter the power of the matrix (current value: %d):\n", *power);
+        printf("Enter power: \n");
         scanf("%d", power); // Take input directly into the power pointer
         if (*power <= 0) {
-            printf("The power needs to be an integer greater than 0.\n");
+            printf("The power need to Integer Greater Then 0 \n");
         }
     } while (*power <= 0);
 
