@@ -6,7 +6,7 @@
 #define MIN_SIZE 1
 
 // Function Prototypes
-int getValidatedInput(const char *prompt, int min, int max);
+int getValidatedInput(const char *prompt, int min, int max, const char *errorMessage);
 void displayMenu();
 int** allocateMatrix(int rows, int cols) ;
 void freeMatrix(int** matrix, int rows) ;
@@ -33,16 +33,16 @@ int main(void) {
     int **mat2;
 
     // Get number of rows
-    numberOfRows = getValidatedInput("Insert Number Of Rows: ", MIN_SIZE, MAX_SIZE);
+    numberOfRows = getValidatedInput("Enter the number of rows: ", MIN_SIZE, MAX_SIZE, "Wrong number of rows, please try again.\n");
 
     // Get number of columns
-    numberOfColumns = getValidatedInput("Insert Number Of Columns: ", MIN_SIZE, MAX_SIZE);
+    numberOfColumns = getValidatedInput("Enter the number of columns: ", MIN_SIZE, MAX_SIZE, "Wrong number of cols, please try again.\n");
     matrix = allocateMatrix(numberOfRows, numberOfColumns);
     SetInitalMatrix(matrix, numberOfRows, numberOfColumns);
     // Display the menu and get user choice
     while (userChoice != 0) {
         displayMenu();
-        userChoice = getValidatedInput("Please enter your choice: ", 0, 9);
+        userChoice = getValidatedInput("Enter a valid value: ", 0, 9, "Wrong input, try again.\n");
 
 
         // Process the choice (placeholders for now)
@@ -103,7 +103,7 @@ int main(void) {
 }
 
 // Function to get validated input
-int getValidatedInput(const char *prompt, int min, int max) {
+int getValidatedInput(const char *prompt, int min, int max, const char *errorMessage) {
     int value;
     char buffer[100];
 
@@ -114,7 +114,7 @@ int getValidatedInput(const char *prompt, int min, int max) {
                 return value;
             }
         }
-        printf("Wrong input, please enter a number between %d and %d.\n", min, max);
+        printf("%s", errorMessage);
     }
 }
 
