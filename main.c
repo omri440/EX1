@@ -19,16 +19,18 @@ void SortMatrix(int** matrix, int rows, int cols) ;
 void PrintMatrixVal(int** matrix, int rows, int cols) ;
 void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) ;
 void SubMatrix(int*** matrix, int* rows, int* cols);
-void MatMul(int*** Mat1, int** Mat2, int dim1, int* dim2, int dim3) ;
+void MatMul(int*** Mat1, int** Mat2, int* dim1, int* dim2, int* dim3) ;
 void PowerMatrixWithDefault(int*** matrix, int* rows, int* cols) ;
 void ValidateSubMatrixInputs(int rows, int cols, int* subRows, int* subCols, int* start_row, int* start_col) ;
 void CalculateSubMatrix(int*** matrix, int* rows, int* cols, int subRows, int subCols, int start_row, int start_col);
 
 int main(void) {
     int numberOfRows = 0;
+    int numberOfColsForMat2 = 0;
     int numberOfColumns = 0;
     int userChoice = -1;
     int **matrix;
+    int **mat2;
 
     // Get number of rows
     numberOfRows = getValidatedInput("Insert Number Of Rows: ", MIN_SIZE, MAX_SIZE);
@@ -70,10 +72,29 @@ int main(void) {
                  SubMatrix(&matrix,&numberOfRows,&numberOfColumns);
                 break;
             case 9:
-                printf("Multiplying with another matrix...\n");
+                printf("Enter columns for the second matrix: \n");
+            scanf("%d", &numberOfColsForMat2);
+
+            // הקצאת זיכרון למטריצה השנייה
+            mat2 = allocateMatrix(numberOfColumns, numberOfColsForMat2);
+
+            // אתחול המטריצה השנייה
+            SetInitalMatrix(mat2, numberOfColumns, numberOfColsForMat2);
+
+            // קלט ערכים למטריצה השנייה
+            printf("Enter values for the matrix (%d * %d):\n", numberOfColumns, numberOfColsForMat2);
+            SetMatrix(mat2, numberOfColumns, numberOfColsForMat2);
+
+            // כפל המטריצות
+            MatMul(&matrix, mat2, &numberOfRows, &numberOfColumns, &numberOfColsForMat2);
+
+            // שחרור זיכרון של המטריצה השנייה
+            freeMatrix(mat2, numberOfColumns);
+
+            // עדכון גדלי המטריצה הראשית לאחר הכפל
+            numberOfColumns = numberOfColsForMat2;
                 break;
             case 0:
-                printf("Exiting the program. Goodbye!\n");
                 break;
         }
     }
@@ -358,4 +379,23 @@ void CalculateSubMatrix(int*** matrix, int* rows, int* cols, int subRows, int su
     *matrix = tempMatrix;
     *rows = subRows;
     *cols = subCols;
+}
+
+void MatMul(int*** Mat1, int** Mat2, int* dim1, int* dim2, int* dim3) {
+    int** tempMatrix = allocateMatrix(*dim1, *dim3);
+
+    for (int i = 0; i < *dim1; i++) {
+        for (int j = 0; j < *dim3; j++) {
+            tempMatrix[i][j] = 0;
+            for (int k = 0; k < *dim2; k++) {
+                tempMatrix[i][j] += (*Mat1)[i][k] * Mat2[k][j];
+            }
+        }
+    }
+
+    // שחרור הזיכרון של המטריצה הישנה
+    freeMatrix(*Mat1, *dim1);
+
+    // עדכון Mat1 לתוצאה החדשה
+    *Mat1 = tempMatrix;
 }
