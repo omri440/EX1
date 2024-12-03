@@ -57,19 +57,15 @@ int main(void) {
                 break;
             case 3:
                 TransposeMatrix(&matrix, &numberOfRows, &numberOfColumns);
-                while (getchar() != '\n');
                 break;
             case 4:
                 SortMatrixByRowSum(matrix, numberOfRows, numberOfColumns);
-                while (getchar() != '\n');
                 break;
             case 5:
                 SortMatrix(matrix, numberOfRows, numberOfColumns);
-            while (getchar() != '\n');
                 break;
             case 6:
                 PrintMatrixVal(matrix, numberOfRows, numberOfColumns);
-                while (getchar() != '\n');
                 break;
             case 7:
                 PowerMatrixWithDefault(&matrix, &numberOfRows, &numberOfColumns);
