@@ -34,7 +34,7 @@ int main(void) {
     int **mat2;
 
     // Get number of rows
-    numberOfRows = getValidatedInput("Insert number of rows", MIN_SIZE, MAX_SIZE, "Wrong number of rows, please try again.\n");
+    numberOfRows = getValidatedColumns("Insert number of rows", MIN_SIZE, MAX_SIZE, "Wrong number of rows, please try again.\n");
 
     // Get number of columns
     numberOfColumns = getValidatedColumns("Insert number of columns", MIN_SIZE, MAX_SIZE, "Wrong number of cols, please try again.\n");
@@ -50,27 +50,35 @@ int main(void) {
         switch (userChoice) {
             case 1:
                 PrintMat(matrix, numberOfRows, numberOfColumns);
+                while (getchar() != '\n');
                 break;
             case 2:
                 SetMatrix(matrix, numberOfRows, numberOfColumns);
+                while (getchar() != '\n');
                 break;
             case 3:
                 TransposeMatrix(&matrix, &numberOfRows, &numberOfColumns);
+                while (getchar() != '\n');
                 break;
             case 4:
                 SortMatrixByRowSum(matrix, numberOfRows, numberOfColumns);
+                while (getchar() != '\n');
                 break;
             case 5:
                 SortMatrix(matrix, numberOfRows, numberOfColumns);
+            while (getchar() != '\n');
                 break;
             case 6:
                 PrintMatrixVal(matrix, numberOfRows, numberOfColumns);
+                while (getchar() != '\n');
                 break;
             case 7:
                 PowerMatrixWithDefault(&matrix, &numberOfRows, &numberOfColumns);
+                 while (getchar() != '\n');
                 break;
             case 8:
                  SubMatrix(&matrix,&numberOfRows,&numberOfColumns);
+                while (getchar() != '\n');
                 break;
             case 9:
                 printf("Enter columns for the second matrix: \n");
@@ -83,7 +91,6 @@ int main(void) {
             SetInitalMatrix(mat2, numberOfColumns, numberOfColsForMat2);
 
             // קלט ערכים למטריצה השנייה
-            printf("Enter values for the matrix (%d * %d):\n", numberOfColumns, numberOfColsForMat2);
             SetMatrix(mat2, numberOfColumns, numberOfColsForMat2);
 
             // כפל המטריצות
@@ -94,6 +101,7 @@ int main(void) {
 
             // עדכון גדלי המטריצה הראשית לאחר הכפל
             numberOfColumns = numberOfColsForMat2;
+                while (getchar() != '\n');
                 break;
             case 0:
                 break;
@@ -111,30 +119,33 @@ int getValidatedInput(const char *prompt, int min, int max, const char *errorMes
     char buffer[100];
 
     while (1) {
-        // Print prompt only if it's not the special menu case
-        if (!(min == 0 && max == 9)) {
-            printf("%s (%d-%d): ", prompt, min, max);
-        }
+        // Print the prompt
 
         // Read input from the user
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-            // Check if the input is empty (user just pressed Enter)
-            if (buffer[0] == '\n') {
-                if (!(min == 0 && max == 9)) { // Error message only for non-menu case
-                    printf("\n");
-                }
+            // Manually find and remove the trailing newline
+            int i = 0;
+            while (buffer[i] != '\0' && buffer[i] != '\n') {
+                i++;
+            }
+            if (buffer[i] == '\n') {
+                buffer[i] = '\0'; // Replace newline with null terminator
+            }
+
+            // Check for empty input (user just pressed Enter or backspaces)
+            if (buffer[0] == '\0') {
+                printf("%s", errorMessage);
                 continue;
             }
 
-            // Validate the input as a number
+            // Validate the input as a single number within range
             if (sscanf(buffer, "%d", &value) == 1 && value >= min && value <= max) {
                 return value; // Valid input, return the value
             }
-        }
 
-        // Display an error message if input is invalid (but not for menu case)
+            // Invalid input
             printf("%s", errorMessage);
-
+        }
     }
 }
 
@@ -436,19 +447,22 @@ void MatMul(int*** Mat1, int** Mat2, int* dim1, int* dim2, int* dim3) {
     *Mat1 = tempMatrix;
 }
 
-
 int getValidatedColumns(const char *prompt, int min, int max, const char *errorMessage) {
     int value;
     char buffer[100];
+    char extra;
 
     while (1) {
         printf("%s (%d-%d): ", prompt, min, max);
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-            if (sscanf(buffer, "%d", &value) == 1) {
+            // Check if the input contains only one valid integer
+            if (sscanf(buffer, "%d %c", &value, &extra) == 1) {
+                // Check if the value is within range
                 if (value >= min && value <= max) {
                     return value;
                 }
             }
+            // Print error message if validation fails
             printf("%s", errorMessage);
         }
     }
