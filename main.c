@@ -42,7 +42,7 @@ int main(void) {
     SetInitalMatrix(matrix, numberOfRows, numberOfColumns);
     // Display the menu and get user choice
     while (userChoice != 0) {
-        displayMenu();
+
         userChoice = getValidatedInput("Please enter your choice:", 0, 9, "Wrong input, try again.\n");
 
 
@@ -50,7 +50,6 @@ int main(void) {
         switch (userChoice) {
             case 1:
                 PrintMat(matrix, numberOfRows, numberOfColumns);
-                while (getchar() != '\n');
                 break;
             case 2:
                 SetMatrix(matrix, numberOfRows, numberOfColumns);
@@ -120,7 +119,7 @@ int getValidatedInput(const char *prompt, int min, int max, const char *errorMes
 
     while (1) {
         // Print the prompt
-
+        displayMenu();
         // Read input from the user
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
             // Manually find and remove the trailing newline
