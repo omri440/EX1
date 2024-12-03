@@ -7,6 +7,7 @@
 
 // Function Prototypes
 int getValidatedInput(const char *prompt, int min, int max, const char *errorMessage);
+int getValidatedColumns(const char *prompt, int min, int max, const char *errorMessage);
 void displayMenu();
 int** allocateMatrix(int rows, int cols) ;
 void freeMatrix(int** matrix, int rows) ;
@@ -36,7 +37,7 @@ int main(void) {
     numberOfRows = getValidatedInput("Insert number of rows", MIN_SIZE, MAX_SIZE, "Wrong number of rows, please try again.\n");
 
     // Get number of columns
-    numberOfColumns = getValidatedInput("Insert number of columns", MIN_SIZE, MAX_SIZE, "Wrong number of cols, please try again.\n");
+    numberOfColumns = getValidatedColumns("Insert number of columns", MIN_SIZE, MAX_SIZE, "Wrong number of cols, please try again.\n");
     matrix = allocateMatrix(numberOfRows, numberOfColumns);
     SetInitalMatrix(matrix, numberOfRows, numberOfColumns);
     // Display the menu and get user choice
@@ -110,15 +111,33 @@ int getValidatedInput(const char *prompt, int min, int max, const char *errorMes
     char buffer[100];
 
     while (1) {
-        printf("%s (%d-%d): ", prompt, min, max);
+        // Print prompt only if it's not the special menu case
+        if (!(min == 0 && max == 9)) {
+            printf("%s (%d-%d): ", prompt, min, max);
+        }
+
+        // Read input from the user
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+            // Check if the input is empty (user just pressed Enter)
+            if (buffer[0] == '\n') {
+                if (!(min == 0 && max == 9)) { // Error message only for non-menu case
+                    printf("\n");
+                }
+                continue;
+            }
+
+            // Validate the input as a number
             if (sscanf(buffer, "%d", &value) == 1 && value >= min && value <= max) {
-                return value;
+                return value; // Valid input, return the value
             }
         }
-        printf("%s", errorMessage);
+
+        // Display an error message if input is invalid (but not for menu case)
+            printf("%s", errorMessage);
+
     }
 }
+
 
 // Function to display the menu
 void displayMenu() {
@@ -128,10 +147,11 @@ void displayMenu() {
     printf("4. Sort the matrix by rows sum.\n");
     printf("5. Sort the whole matrix.\n");
     printf("6. Print matrix value.\n");
-    printf("7. Compute i-th power of matrix.\n");
-    printf("8. Find submatrix.\n");
+    printf("7. i-th power of matrix\n");
+    printf("8. Find sub matrix.\n");
     printf("9. Multiply with another matrix.\n");
     printf("0. Exit.\n");
+    printf("Please enter your choice: ");
 }
 
 
@@ -415,4 +435,23 @@ void MatMul(int*** Mat1, int** Mat2, int* dim1, int* dim2, int* dim3) {
     // עדכון Mat1 לתוצאה החדשה
     *Mat1 = tempMatrix;
 }
+
+
+int getValidatedColumns(const char *prompt, int min, int max, const char *errorMessage) {
+    int value;
+    char buffer[100];
+
+    while (1) {
+        printf("%s (%d-%d): ", prompt, min, max);
+        if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+            if (sscanf(buffer, "%d", &value) == 1) {
+                if (value >= min && value <= max) {
+                    return value;
+                }
+            }
+            printf("%s", errorMessage);
+        }
+    }
+}
+
 
