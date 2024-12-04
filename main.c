@@ -9,29 +9,29 @@
 int getValidatedInput(const char *prompt, int min, int max, const char *errorMessage);
 int getValidatedColumns(const char *prompt, int min, int max, const char *errorMessage);
 void displayMenu();
-int** allocateMatrix(int rows, int cols) ;
-void freeMatrix(int** matrix, int rows) ;
-void PrintMat(int** matrix, int rows, int cols) ;
-void SetMatrix(int** matrix, int rows, int cols);
-void SetInitalMatrix(int** matrix, int rows, int cols);
-void TransposeMatrix(int*** matrix, int* rows, int* cols);
-void SortMatrixByRowSum(int** matrix, int rows, int cols);
-void SortMatrix(int** matrix, int rows, int cols) ;
-void PrintMatrixVal(int** matrix, int rows, int cols) ;
-void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) ;
-void SubMatrix(int*** matrix, int* rows, int* cols);
-void MatMul(int*** Mat1, int** Mat2, int* dim1, int* dim2, int* dim3) ;
-void PowerMatrixWithDefault(int*** matrix, int* rows, int* cols) ;
-void ValidateSubMatrixInputs(int rows, int cols, int* subRows, int* subCols, int* start_row, int* start_col) ;
-void CalculateSubMatrix(int*** matrix, int* rows, int* cols, int subRows, int subCols, int start_row, int start_col);
+long** allocateMatrix(int rows, int cols);
+void freeMatrix(long** matrix, int rows);
+void PrintMat(long** matrix, int rows, int cols);
+void SetMatrix(long** matrix, int rows, int cols);
+void SetInitalMatrix(long** matrix, int rows, int cols);
+void TransposeMatrix(long*** matrix, int* rows, int* cols);
+void SortMatrixByRowSum(long** matrix, int rows, int cols);
+void SortMatrix(long** matrix, int rows, int cols);
+void PrintMatrixVal(long** matrix, int rows, int cols);
+void PowerMatrix(long*** matrix, int* rows, int* cols, int* power);
+void SubMatrix(long*** matrix, int* rows, int* cols);
+void MatMul(long*** Mat1, long** Mat2, int* dim1, int* dim2, int* dim3);
+void PowerMatrixWithDefault(long*** matrix, int* rows, int* cols);
+void ValidateSubMatrixInputs(int rows, int cols, int* subRows, int* subCols, int* start_row, int* start_col);
+void CalculateSubMatrix(long*** matrix, int* rows, int* cols, int subRows, int subCols, int start_row, int start_col);
 
 int main(void) {
     int numberOfRows = 0;
     int numberOfColsForMat2 = 0;
     int numberOfColumns = 0;
     int userChoice = -1;
-    int **matrix;
-    int **mat2;
+    long **matrix;
+    long **mat2;
 
     // Get number of rows
     numberOfRows = getValidatedColumns("Insert number of rows", MIN_SIZE, MAX_SIZE, "Wrong number of rows, please try again.\n");
@@ -153,31 +153,31 @@ void displayMenu() {
     printf("4. Sort the matrix by rows sum.\n");
     printf("5. Sort the whole matrix.\n");
     printf("6. Print matrix value.\n");
-    printf("7. i-th power of matrix\n");
+    printf("7. i-th power of matrix.\n");
     printf("8. Find sub matrix.\n");
     printf("9. Multiply with another matrix.\n");
     printf("0. Exit.\n");
-    printf("Please enter your choice: ");
+    printf("Please enter your choice: \n");
 }
 
 
-int **allocateMatrix(int rows, int columns) {
-    int **matrix = malloc(rows * sizeof(int *));
+long** allocateMatrix(int rows, int columns) {
+    long** matrix = malloc(rows * sizeof(long*));
     for (int i = 0; i < rows; i++) {
-        matrix[i] = malloc(columns * sizeof(int));
+        matrix[i] = malloc(columns * sizeof(long));
     }
     return matrix;
 }
 
 // Function to free a matrix
-void freeMatrix(int **matrix, int rows) {
+void freeMatrix(long** matrix, int rows) {
     for (int i = 0; i < rows; i++) {
         free(matrix[i]);
     }
     free(matrix);
 }
 
-void SetInitalMatrix(int** matrix, int rows, int cols) {
+void SetInitalMatrix(long** matrix, int rows, int cols) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             matrix[i][j] = 0;
@@ -185,25 +185,23 @@ void SetInitalMatrix(int** matrix, int rows, int cols) {
     }
 }
 
-void PrintMat(int** matrix, int rows, int cols) {
+void PrintMat(long** matrix, int rows, int cols) {
     printf("Matrix:\n");
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            printf("%d ", matrix[i][j]);
+            printf("%ld ", matrix[i][j]);
         }
-
-            printf("\n");
-
+        printf("\n");
     }
 }
 
-void SetMatrix(int** matrix, int rows, int cols) {
-    printf("Enter values for the matrix (%d X %d):\n", rows,cols);
+void SetMatrix(long** matrix, int rows, int cols) {
+    printf("Enter values for the matrix (%d x %d):\n", rows, cols);
 
     int count = 0;
     while (count < rows * cols) {
-        int value;
-        if (scanf("%d", &value) == 1) {
+        long value;
+        if (scanf("%ld", &value) == 1) {
             int row = count / cols;
             int col = count % cols;
             matrix[row][col] = value;
@@ -215,11 +213,11 @@ void SetMatrix(int** matrix, int rows, int cols) {
     }
 }
 
-void TransposeMatrix(int*** matrix, int* rows, int* cols) {
+void TransposeMatrix(long*** matrix, int* rows, int* cols) {
     // Allocate a new transposed matrix
-    int** transposed = malloc((*cols) * sizeof(int*));
+    long** transposed = malloc((*cols) * sizeof(long*));
     for (int i = 0; i < *cols; i++) {
-        transposed[i] = malloc((*rows) * sizeof(int));
+        transposed[i] = malloc((*rows) * sizeof(long));
     }
 
     // Fill the transposed matrix
@@ -246,31 +244,32 @@ void TransposeMatrix(int*** matrix, int* rows, int* cols) {
 
 
 
-void SortMatrixByRowSum(int** matrix, int rows, int cols) {
-    for (int i = 1; i < rows; i++) {
-        // חישוב סכום השורה הנוכחית
-        int currentRowSum = 0;
-        for (int j = 0; j < cols; j++) {
-            currentRowSum += matrix[i][j];
-        }
+void SortMatrixByRowSum(long** matrix, int rows, int cols) {
+    int swapped;
+    do {
+        swapped = 0; // דגל לסימון אם הייתה החלפה
+        for (int i = 0; i < rows - 1; i++) {
+            // חישוב סכום השורה הנוכחית
+            int currentRowSum = 0, nextRowSum = 0;
+            for (int j = 0; j < cols; j++) {
+                currentRowSum += matrix[i][j];
+                nextRowSum += matrix[i + 1][j];
+            }
 
-        // חישוב סכום השורה הקודמת
-        int previousRowSum = 0;
-        for (int j = 0; j < cols; j++) {
-            previousRowSum += matrix[i - 1][j];
-        }
 
-        // השוואה והחלפה לפי הצורך
-        if (currentRowSum < previousRowSum) {
-            // החלפה בין השורות
-            int* temp = matrix[i - 1];
-            matrix[i - 1] = matrix[i];
-            matrix[i] = temp;
+
+            // השוואה והחלפה
+            if (currentRowSum > nextRowSum) {
+                long* temp = matrix[i];
+                matrix[i] = matrix[i + 1];
+                matrix[i + 1] = temp;
+                swapped = 1; // מסמן שהייתה החלפה
+            }
         }
-    }
+    } while (swapped); // חזרה על הלולאה עד שאין יותר החלפות
 }
 
-void SortMatrix(int** matrix, int rows, int cols) {
+void SortMatrix(long** matrix, int rows, int cols) {
     bool sorted = false;
     while (!sorted) {
         sorted = true;
@@ -294,24 +293,24 @@ void SortMatrix(int** matrix, int rows, int cols) {
     }
 }
 
-void PrintMatrixVal(int** matrix, int rows, int cols) {
-    int sumProduct = 0 ;
+void PrintMatrixVal(long** matrix, int rows, int cols) {
+    long sumProduct = 0 ;
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             sumProduct += matrix[i][j]*(i+1)*(j+1);
         }
 
     }
-    printf("Matrix Value: %d\n",sumProduct);
+    printf("Matrix value: %ld\n",sumProduct);
 }
 
-void PowerMatrixWithDefault(int*** matrix, int* rows, int* cols) {
+void PowerMatrixWithDefault(long*** matrix, int* rows, int* cols) {
     int defaultPower = 0; // Start with default value 0 to trigger user input in PowerMatrix
     PowerMatrix(matrix, rows, cols, &defaultPower);
 }
 
 
-void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) {
+void PowerMatrix(long*** matrix, int* rows, int* cols, int* power) {
     // Check if the matrix is square
     if (*rows != *cols) {
         printf("Matrix must be square for this operation.");
@@ -333,8 +332,8 @@ void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) {
     } while (*power <= 0);
 
     // Temporary matrices to store results
-    int** tempMatrix = allocateMatrix(*rows, *cols);  // Temporary result
-    int** originalMatrix = allocateMatrix(*rows, *cols);  // Copy of the original matrix
+    long** tempMatrix = allocateMatrix(*rows, *cols);  // Temporary result
+    long** originalMatrix = allocateMatrix(*rows, *cols);  // Copy of the original matrix
 
     // Copy the original matrix into originalMatrix
     for (int i = 0; i < *rows; i++) {
@@ -368,7 +367,7 @@ void PowerMatrix(int*** matrix, int* rows, int* cols, int* power) {
 }
 
 
-void SubMatrix(int*** matrix, int* rows, int* cols) {
+void SubMatrix(long*** matrix, int* rows, int* cols) {
     int subRows, subCols, start_row, start_col;
 
     // Validate inputs
@@ -390,7 +389,7 @@ void ValidateSubMatrixInputs(int rows, int cols, int* subRows, int* subCols, int
         printf("Enter submatrix columns: ");
         scanf("%d", subCols);
 
-        printf("Enter base columns: ");
+        printf("Enter base col: ");
         scanf("%d", start_col);
 
 
@@ -405,9 +404,9 @@ void ValidateSubMatrixInputs(int rows, int cols, int* subRows, int* subCols, int
 }
 
 
-void CalculateSubMatrix(int*** matrix, int* rows, int* cols, int subRows, int subCols, int start_row, int start_col) {
+void CalculateSubMatrix(long*** matrix, int* rows, int* cols, int subRows, int subCols, int start_row, int start_col) {
     // Allocate space for the submatrix
-    int** tempMatrix = allocateMatrix(subRows, subCols);
+    long** tempMatrix = allocateMatrix(subRows, subCols);
 
     // Copy submatrix values
     for (int i = 0; i < subRows; i++) {
@@ -423,8 +422,8 @@ void CalculateSubMatrix(int*** matrix, int* rows, int* cols, int subRows, int su
     *cols = subCols;
 }
 
-void MatMul(int*** Mat1, int** Mat2, int* dim1, int* dim2, int* dim3) {
-    int** tempMatrix = allocateMatrix(*dim1, *dim3);
+void MatMul(long*** Mat1, long** Mat2, int* dim1, int* dim2, int* dim3) {
+    long** tempMatrix = allocateMatrix(*dim1, *dim3);
 
     for (int i = 0; i < *dim1; i++) {
         for (int j = 0; j < *dim3; j++) {
@@ -435,10 +434,7 @@ void MatMul(int*** Mat1, int** Mat2, int* dim1, int* dim2, int* dim3) {
         }
     }
 
-    // שחרור הזיכרון של המטריצה הישנה
     freeMatrix(*Mat1, *dim1);
-
-    // עדכון Mat1 לתוצאה החדשה
     *Mat1 = tempMatrix;
 }
 
