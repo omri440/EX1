@@ -130,10 +130,10 @@ int getValidatedInput(const char *prompt, int min, int max, const char *errorMes
                 i++;
             }
             if (buffer[i] == '\n') {
-                buffer[i] = '\0'; // Replace newline with null terminator
+                buffer[i] = '\0';
             }
 
-            // Check for empty input (user just pressed Enter or backspaces)
+
             if (buffer[0] == '\0') {
                 printf("%s", errorMessage);
                 continue;
@@ -223,7 +223,7 @@ void SetMatrix(long** matrix, int rows, int cols) {
             count++;
         } else {
             printf("Invalid input, please try again.\n");
-            while (getchar() != '\n');  // Clear the input buffer
+            while (getchar() != '\n');
         }
     }
 }
@@ -346,10 +346,10 @@ void PowerMatrix(long*** matrix, int* rows, int* cols, int* power) {
 
     // If power was set to the default value, ask for user input
     do {
-        printf(" Enter power: ");
+        printf("Enter power: ");
         scanf("%d", power); // Take input directly into the power pointer
         if (*power <= 0) {
-            printf(" The power need to Integer Greater Then 0 \n");
+            printf("The power need to Integer Greater Then 0\n");
         }
     } while (*power <= 0);
 
@@ -445,7 +445,7 @@ void CalculateSubMatrix(long*** matrix, int* rows, int* cols, int subRows, int s
 }
 
 void MatMul(long*** Mat1, long** Mat2, int* dim1, int* dim2, int* dim3) {
-    long** tempMatrix = allocateMatrix(*dim1, *dim3);
+     long** tempMatrix = allocateMatrix(*dim1, *dim3);
 
     for (int i = 0; i < *dim1; i++) {
         for (int j = 0; j < *dim3; j++) {
